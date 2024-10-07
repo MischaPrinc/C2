@@ -12,8 +12,8 @@ if ($conn->connect_error) {
     die("Připojení selhalo: " . $conn->connect_error);
 }
 
-$hardwareId = addslashes($_POST['hardwareId']);
-$ipAddress = addslashes($_SERVER['REMOTE_ADDR']);
+$hardwareId = $conn->real_escape_string($_POST['hardwareId']);
+$ipAddress = $conn->real_escape_string($_SERVER['REMOTE_ADDR']);
 
 // Vložení záznamu do tabulky online
 $sql = "INSERT INTO online (hardwareId, ipAddress, timestamp) VALUES ('$hardwareId', '$ipAddress', NOW())";
@@ -26,7 +26,7 @@ $result = $conn->query($sql);
 if ($result->num_rows > 0) {
     // Výstup úkolu
     $row = $result->fetch_assoc();
-    echo $row['task'];
+    echo htmlspecialchars($row['task']);
 
     // Aktualizace stavu úkolu na 'in progress'
     $updateSql = "UPDATE tasks SET status='in progress' WHERE hardwareId='$hardwareId' AND status='pending' LIMIT 1";

@@ -13,18 +13,19 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $hardwareId = addslashes($_POST['hardwareId']);
-    $task = addslashes($_POST['task']);
+    $hardwareId = $conn->real_escape_string($_POST['hardwareId']);
+    $task = $conn->real_escape_string($_POST['task']);
 
     $sql = "INSERT INTO tasks (hardwareId, task, status) VALUES ('$hardwareId', '$task', 'pending')";
     if ($conn->query($sql) === TRUE) {
         header('Location: tasks.php?hardwareId='. $hardwareId);
+        exit();
     } else {
         echo "Chyba: " . $sql . "<br>" . $conn->error;
     }
 }
 
-$hardwareId = $_GET['hardwareId'];
+$hardwareId = $conn->real_escape_string($_GET['hardwareId']);
 
 // Výběr úkolů pro dané hardware ID
 $sql = "SELECT * FROM tasks WHERE hardwareId='$hardwareId' ORDER by ID DESC LIMIT 10";
@@ -36,17 +37,17 @@ $result = $conn->query($sql);
 <html>
 <head>
     <title>Správa úkolů</title>
-<meta http-equiv="refresh" content="60">
+    <meta http-equiv="refresh" content="60">
 </head>
 <body>
-    <h1>Přidat úkol pro Hardware ID: <?php echo $hardwareId; ?></h1>
+    <h1>Přidat úkol pro Hardware ID: <?php echo htmlspecialchars($hardwareId); ?></h1>
     <form method="post" action="">
-        <input type="hidden" name="hardwareId" value="<?php echo $hardwareId; ?>">
+        <input type="hidden" name="hardwareId" value="<?php echo htmlspecialchars($hardwareId); ?>">
         Úkol: <input type="text" name="task" required><br>
         <input type="submit" value="Přidat úkol">
     </form>
-<hr>
-    <h1>Seznam úkolů - <?php echo $hardwareId; ?></h1><a href="index.php">Zpět</a><br><br>
+    <hr>
+    <h1>Seznam úkolů - <?php echo htmlspecialchars($hardwareId); ?></h1><a href="index.php">Zpět</a><br><br>
     <table border="1">
         <tr>
             <th>ID</th>
@@ -58,14 +59,14 @@ $result = $conn->query($sql);
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
                 echo "<tr>
-                        <td>" . $row["id"]. "</td>
-                        <td>" . $row["task"]. "</td>
-                        <td>" . $row["status"]. "</td>
-                        <td><pre>" . $row["result"]. "<pre></td>
+                        <td>" . htmlspecialchars($row["id"]). "</td>
+                        <td>" . htmlspecialchars($row["task"]). "</td>
+                        <td>" . htmlspecialchars($row["status"]). "</td>
+                        <td><pre>" . htmlspecialchars($row["result"]). "<pre></td>
                       </tr>";
             }
         } else {
-            echo "<tr><td colspan='5'>Žádné úkoly</td></tr>";
+            echo "<tr><td colspan='4'>Žádné úkoly</td></tr>";
         }
         ?>
     </table>

@@ -17,7 +17,7 @@ $currentTime = date('Y-m-d H:i:s');
 $timeFiveMinutesAgo = date('Y-m-d H:i:s', strtotime('-5 minutes'));
 
 // Výběr unikátních hardware ID, která se přihlásila v posledních 5 minutách
-$sql = "SELECT DISTINCT hardwareId, MAX(timestamp) as last_seen, ipAddress FROM online WHERE timestamp >= '$timeFiveMinutesAgo' GROUP BY hardwareId";
+$sql = "SELECT DISTINCT hardwareId, MAX(timestamp) as last_seen, ipAddress FROM online WHERE timestamp >= '$timeFiveMinutesAgo' GROUP BY hardwareId, ipAddress";
 $result = $conn->query($sql);
 ?>
 
@@ -25,7 +25,7 @@ $result = $conn->query($sql);
 <html>
 <head>
     <title>Seznam online počítačů</title>
-<meta http-equiv="refresh" content="10">
+    <meta http-equiv="refresh" content="10">
 </head>
 <body>
     <h1>Seznam online počítačů</h1>
@@ -40,14 +40,14 @@ $result = $conn->query($sql);
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
                 echo "<tr>
-                        <td>" . $row["hardwareId"]. "</td>
-                        <td>" . $row["ipAddress"]. "</td>
-                        <td>" . $row["last_seen"]. "</td>
-                        <td><a href='tasks.php?hardwareId=" . $row["hardwareId"] . "'>Seznam úkolů</a></td>
+                        <td>" . htmlspecialchars($row["hardwareId"]). "</td>
+                        <td>" . htmlspecialchars($row["ipAddress"]). "</td>
+                        <td>" . htmlspecialchars($row["last_seen"]). "</td>
+                        <td><a href='tasks.php?hardwareId=" . htmlspecialchars($row["hardwareId"]) . "'>Seznam úkolů</a></td>
                       </tr>";
             }
         } else {
-            echo "<tr><td colspan='5'>Žádné počítače se nepřihlásily v posledních 5 minutách</td></tr>";
+            echo "<tr><td colspan='4'>Žádné počítače se nepřihlásily v posledních 5 minutách</td></tr>";
         }
         ?>
     </table>
@@ -56,3 +56,4 @@ $result = $conn->query($sql);
 <?php
 $conn->close();
 ?>
+
