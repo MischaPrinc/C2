@@ -121,7 +121,7 @@ namespace C2client
             {
                 retval = webClient.DownloadString(url);
             }
-
+            
             return retval;
         }
     }
